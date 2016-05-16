@@ -8,21 +8,31 @@
 
 cpu 286
 
-%macro far_ptr 2
-.off		dw	%2
-.seg		dw	%1
+%macro res_fptr 0
+.off		resw	1
+.seg		resw	1
 %endmacro
 
 PSP_SZ		equ	100h
+STACK_SZ	equ	32
 
-section .text
+section code
 
-		org	100h
-
-main:		mov	sp, stktop
-		mov	bx, (PSP_SZ+stktop-main)/16 + 1	; new size in pars
+main:
+..start:	mov	bx, PSP_SZ + __stktop wrt code	; new size in pars
+		shr	bx, 4
 		mov	ah, 4Ah				; resize memory block
 		int	21h
+
+		push	cs				; init bss
+		pop	es				;
+		mov	al, 0				;
+		mov	di, __bss			;
+		mov	cx, __bssend - __bss		;
+		rep stosb				;
+
+		push	cs				; setup data segment
+		pop	ds
 
 		mov	ax, 3521h			; read int 21h vector
 		int	21h				; es:bx <- cur handler
@@ -82,14 +92,20 @@ uninstall:
 
 ;------------------------------------------------------------------------------
 
-intcnt		db	0
-parmblk		dw	0				; environment seg
-cmdtail		far_ptr	0, 0				; cmd tail
-		dd	0				; first FCB address
-		dd	0				; second FCB address
-
-int21		far_ptr	0, 0
 errmsg		db	"Unable to exec original "
 exe		db	"gold.exe",0,"$"
 
-stktop		equ	$+64
+__bss		equ	$
+intcnt		resb	1
+parmblk		resw	1				; environment seg
+cmdtail		res_fptr				; cmd tail
+		resd	1				; first FCB address
+		resd	1				; second FCB address
+
+int21		res_fptr
+__bssend	equ	$
+
+section stack stack align=16
+
+		resb	STACK_SZ
+__stktop	equ	$

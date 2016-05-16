@@ -1,22 +1,37 @@
 # Use Borland Make >= 3.6
 
 NASM = nasm
+TLINK = tlink
 PKZIP = pkzip
+EHOPT = ehopt # comment out this line if ehopt isn't available on your system
+META = http://sinil.in/mintware/goldenaxe/
 
-prog = goldload.com
-dist = $(prog:.com=.zip)
+prog = goldload.exe
+dist = $(prog:.exe=.zip)
+obj = goldload.obj
 
-$(prog):
+$(prog): $(obj)
+	$(TLINK) /s @&&!
+	$**
+	$@
+!
+!if $d(EHOPT)
+	$(EHOPT) $@ $*.opt "$(META)"
+	del $@
+	rename $*.opt $@
+!endif
 
-.asm.com:
-	$(NASM) -f bin -o $@ -l $&.lst $<
+.asm.obj:
+	$(NASM) -f obj -o $@ -l $&.lst $<
 
-.com.zip:
+.exe.zip:
 	$(PKZIP) $@ $<
 
 dist: $(dist)
 
 clean:
 	del *.lst
+	del *.obj
+	del *.map
 	del $(prog)
 	del $(dist)
