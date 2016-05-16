@@ -60,16 +60,12 @@ int_handler:
 		cmp	byte [cs:intcnt], 2
 		jne	.legacy
 		pusha
-		push	ds
-		push	es
 
 		mov	byte [ds:4842h], 1	; skip prot. question
 		mov	byte [ds:4845h], 0	; imitate correct answer
 
 		call	uninstall	; restore original vector of int 21h
 
-		pop	es
-		pop	ds
 		popa
 .legacy:	jmp	far [cs:int21]
 
