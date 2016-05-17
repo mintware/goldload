@@ -66,9 +66,8 @@ main:
 int_handler:
 		cmp	ah, 4Ah
 		jne	.legacy
-		inc	byte [cs:intcnt]
-		cmp	byte [cs:intcnt], 2
-		jne	.legacy
+		dec	byte [cs:intcnt]
+		jnz	.legacy
 		pusha
 
 		mov	byte [ds:4842h], 1	; skip prot. question
@@ -92,11 +91,11 @@ uninstall:
 
 ;------------------------------------------------------------------------------
 
+intcnt		db	2
 errmsg		db	"Unable to exec original "
 exe		db	"gold.exe",0,"$"
 
 __bss		equ	$
-intcnt		resb	1
 parmblk		resw	1				; environment seg
 cmdtail		res_fptr				; cmd tail
 		resd	1				; first FCB address
