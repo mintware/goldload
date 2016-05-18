@@ -19,7 +19,7 @@ STACK_SZ	equ	32
 section code
 
 main:
-..start:	mov	bx, PSP_SZ + __stktop wrt code	; new size in pars
+..start:	mov	bx, PSP_SZ + __stktop		; new size in pars
 		shr	bx, 4
 		mov	ah, 4Ah				; resize memory block
 		int	21h
@@ -95,6 +95,8 @@ intcnt		db	2
 errmsg		db	"Unable to exec original "
 exe		db	"gold.exe",0,"$"
 
+section bss
+
 __bss		equ	$
 parmblk		resw	1				; environment seg
 cmdtail		res_fptr				; cmd tail
@@ -108,3 +110,5 @@ section stack stack align=16
 
 		resb	STACK_SZ
 __stktop	equ	$
+
+group all code bss stack
