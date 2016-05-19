@@ -24,16 +24,13 @@ main:
 		mov	ah, 4Ah				; resize memory block
 		int	21h
 
-		push	cs				; init bss
-		pop	es				;
-		mov	al, 0				;
-		mov	di, __bss			;
-		mov	cx, __bssend - __bss		;
-		cld
-		rep stosb				;
-
 		push	cs				; setup data segment
 		pop	ds
+
+		mov	bx, __bssend - __bss
+zero_bss:	dec	bx
+		mov	byte [__bss + bx], bh
+		jnz	zero_bss
 
 		mov	ax, 3521h			; read int 21h vector
 		int	21h				; es:bx <- cur handler
