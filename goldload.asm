@@ -29,6 +29,7 @@ main:
 		mov	al, 0				;
 		mov	di, __bss			;
 		mov	cx, __bssend - __bss		;
+		cld
 		rep stosb				;
 
 		push	cs				; setup data segment
