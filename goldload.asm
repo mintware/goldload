@@ -28,9 +28,9 @@ main:
 		pop	ds
 
 		mov	bx, __bssend - __bss
-zero_bss:	dec	bx
+.zero_bss:	dec	bx
 		mov	byte [__bss + bx], bh
-		jnz	zero_bss
+		jnz	.zero_bss
 
 		mov	ax, 3521h			; read int 21h vector
 		int	21h				; es:bx <- cur handler
