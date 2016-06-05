@@ -32,6 +32,9 @@ main:
 		mov	byte [__bss + bx], bh
 		jnz	.zero_bss
 
+		mov	[cmdtail.seg], es		; pass cmd tail from
+		mov	word [cmdtail.off], 80h		; our PSP
+
 		mov	ax, 3521h			; read int 21h vector
 		int	21h				; es:bx <- cur handler
 		mov	[int21.seg], es			; save original
@@ -41,9 +44,9 @@ main:
 		mov	ax, 2521h			; handler for int 21h
 		int	21h				; ds:dx -> new handler
 
-		mov	[cmdtail.seg], cs		; pass cmd tail from
-		mov	word [cmdtail.off], 80h		; our PSP
 		mov	dx, exe
+		push	ds
+		pop	es
 		mov	bx, parmblk
 		mov	ax, 4B00h			; exec
 		int	21h
