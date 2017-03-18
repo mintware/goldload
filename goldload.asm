@@ -71,8 +71,8 @@ int_handler:
 		jnz	.legacy
 		pusha
 
-		mov	byte [ds:4842h], 1	; skip prot. question
-		mov	byte [ds:4845h], 0	; imitate correct answer
+		mov	byte [4842h], 1	; skip prot. question
+		mov	byte [4845h], 0	; imitate correct answer
 
 		call	uninstall	; restore original vector of int 21h
 
