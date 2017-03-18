@@ -7,6 +7,7 @@
 ;
 
 cpu 286
+[map all goldload.map]
 
 %macro res_fptr 0
 .off		resw	1
@@ -16,23 +17,25 @@ cpu 286
 PSP_SZ		equ	100h
 STACK_SZ	equ	32
 
-section code
+section .text
 
-main:
-..start:	mov	bx, PSP_SZ + __stktop		; new size in pars
-		shr	bx, 4
+		org	PSP_SZ
+
+		jmp	short main
+		db	"http://sinil.in/mintware/goldenaxe/"
+
+main:		mov	sp, __stktop
+		mov	bx, sp
+		shr	bx, 4				; new size in pars
 		mov	ah, 4Ah				; resize memory block
 		int	21h
 
-		push	cs				; setup data segment
-		pop	ds
-
-		mov	bx, __bssend - __bss
+		mov	bx, __bss_size
 .zero_bss:	dec	bx
 		mov	byte [__bss + bx], bh
 		jnz	.zero_bss
 
-		mov	[cmdtail.seg], es		; pass cmd tail from
+		mov	[cmdtail.seg], cs		; pass cmd tail from
 		mov	word [cmdtail.off], 80h		; our PSP
 
 		mov	ax, 3521h			; read int 21h vector
@@ -96,7 +99,8 @@ intcnt		db	2
 errmsg		db	"Unable to exec original "
 exe		db	"gold.exe",0,"$"
 
-section bss
+
+section .bss follows=.text nobits
 
 __bss		equ	$
 parmblk		resw	1				; environment seg
@@ -105,11 +109,10 @@ cmdtail		res_fptr				; cmd tail
 		resd	1				; second FCB address
 
 int21		res_fptr
-__bssend	equ	$
+__bss_size	equ	$-__bss
 
-section stack stack align=16
 
-		resb	STACK_SZ
-__stktop	equ	$
+section .stack align=16 follows=.bss nobits
 
-group all code bss stack
+		resb	(STACK_SZ+15) & ~15		; make sure __stktop
+__stktop	equ	$				; is on segment boundary
