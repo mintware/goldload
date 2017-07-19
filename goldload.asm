@@ -86,8 +86,7 @@ int_handler:
 
 uninstall:
 		push	ds
-		mov	ds, [cs:int21.seg]
-		mov	dx, [cs:int21.off]
+		lds	dx, [cs:int21]
 		mov	ax, 2521h
 		int	21h
 		pop	ds
