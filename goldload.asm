@@ -15,7 +15,7 @@ cpu 286
 %endmacro
 
 PSP_SZ		equ	100h
-STACK_SZ	equ	32
+STACK_SZ	equ	64
 
 section .text
 
