@@ -22,7 +22,7 @@ section .text
 		org	PSP_SZ
 
 		jmp	short main
-		db	"http://sinil.in/mintware/goldenaxe/"
+byemsg		db	"Visit http://sinil.in/mintware/goldenaxe/$"
 
 main:		mov	sp, __stktop
 		mov	bx, sp
@@ -54,13 +54,15 @@ main:		mov	sp, __stktop
 		mov	ax, 4B00h			; exec
 		int	21h
 
-		jnc	.exit
+		jnc	.success
 		call	uninstall
 		mov	dx, errmsg
-		mov	ah, 9
-		int	21h
+		jmp	short .exit
 
-.exit:		mov	ah, 4Dh				; read errorlevel
+.success:	mov	dx, byemsg
+.exit:		mov	ah, 9
+		int	21h
+		mov	ah, 4Dh				; read errorlevel
 		int	21h				; errorlevel => AL
 		mov	ah, 4Ch				; exit
 		int	21h
